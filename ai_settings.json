@@ -1,0 +1,6 @@
+{
+    "response_style": "Professional",
+    "emotion_sensitivity": 5,
+    "context_window": 10,
+    "language_model": "Gemini Pro"
+}

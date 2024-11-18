@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mino AI Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="profile-section">
+                <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Profile" class="profile-avatar">
+                <h3 class="profile-name">{{ user.name }}</h3>
+                <p class="profile-status">Active</p>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            Conversations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📈</span>
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="dashboard-title">Welcome back, {{ user.name }}!</h1>
+                <div class="header-actions">
+                    <button class="chart-control">New Chat</button>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Conversations</div>
+                    <div class="stat-value">{{ stats.total_conversations }}</div>
+                    <div class="stat-change positive">
+                        +{{ stats.conversation_increase }}% from last week
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Average Sentiment</div>
+                    <div class="stat-value">{{ stats.avg_sentiment }}</div>
+                    <div class="stat-change positive">
+                        +{{ stats.sentiment_increase }}% positive trend
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Topics Explored</div>
+                    <div class="stat-value">{{ stats.topics_count }}</div>
+                    <div class="stat-change">
+                        {{ stats.top_topic }} is trending
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Emotional Analysis Timeline</h2>
+                    <div class="chart-controls">
+                        <button class="chart-control active">Week</button>
+                        <button class="chart-control">Month</button>
+                        <button class="chart-control">Year</button>
+                    </div>
+                </div>
+                <canvas id="emotionTimeline" class="emotion-timeline"></canvas>
+            </div>
+
+            <div class="preferences-section">
+                <h2>Your Preferences</h2>
+                <div class="preference-item">
+                    <span class="preference-label">Response Style</span>
+                    <span class="preference-value">{{ user.preferences.response_style }}</span>
+                </div>
+                <div class="preference-item">
+                    <span class="preference-label">Technical Level</span>
+                    <span class="preference-value">{{ user.preferences.technical_level }}</span>
+                </div>
+                <div class="preference-item">
+                    <span class="preference-label">Preferred Topics</span>
+                    <span class="preference-value">{{ user.preferences.preferred_topics|join(', ') }}</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('emotionTimeline').getContext('2d');
+            
+            const emotionData = {
+                labels: {{ emotion_timeline.dates|tojson }},
+                datasets: [
+                    {
+                        label: 'Positive',
+                        data: {{ emotion_timeline.positive|tojson }},
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Neutral',
+                        data: {{ emotion_timeline.neutral|tojson }},
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Negative',
+                        data: {{ emotion_timeline.negative|tojson }},
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4
+                    }
+                ]
+            };
+
+            new Chart(ctx, {
+                type: 'line',
+                data: emotionData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Emotion Score'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

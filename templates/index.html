@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mino AI - Your Advanced AI Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .message {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .emotion-indicator {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        .tone-indicator {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: typing 1s infinite;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Mino AI</h1>
+            <p class="text-gray-600">Your Advanced AI Companion</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+            <div class="chat-container mb-6" id="chatContainer">
+                <div class="welcome-message bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        Welcome to Mino AI! I'm your emotionally intelligent chat companion. 
+                        I can understand and respond to your emotions while maintaining context 
+                        throughout our conversation.
+                    </p>
+                </div>
+                <!-- Chat messages will be inserted here -->
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span style="animation-delay: 0.2s"></span>
+                <span style="animation-delay: 0.4s"></span>
+            </div>
+
+            <form id="chatForm" class="flex gap-4">
+                <input type="text" 
+                       id="messageInput" 
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                       placeholder="Type your message here..."
+                       required>
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Generate a simple user ID for this session
+        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function getEmotionColor(emotion) {
+            const emotionColors = {
+                'joy': 'bg-yellow-200',
+                'sadness': 'bg-blue-200',
+                'anger': 'bg-red-200',
+                'fear': 'bg-purple-200',
+                'surprise': 'bg-green-200',
+                'neutral': 'bg-gray-200'
+            };
+            return emotionColors[emotion.toLowerCase()] || 'bg-gray-200';
+        }
+
+        function getToneColor(tone) {
+            const toneColors = {
+                'formal': 'bg-indigo-200',
+                'casual': 'bg-orange-200',
+                'friendly': 'bg-green-200',
+                'professional': 'bg-blue-200',
+                'neutral': 'bg-gray-200'
+            };
+            return toneColors[tone.toLowerCase()] || 'bg-gray-200';
+        }
+
+        function addMessage(message, isUser = false, emotion = null, tone = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `max-w-3/4 ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg px-4 py-2 ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'}`;
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = message;
+            contentDiv.appendChild(textSpan);
+
+            if (emotion) {
+                const emotionSpan = document.createElement('span');
+                emotionSpan.className = `emotion-indicator ${getEmotionColor(emotion.primary_emotion)}`;
+                emotionSpan.textContent = emotion.primary_emotion;
+                contentDiv.appendChild(emotionSpan);
+            }
+
+            if (tone) {
+                const toneSpan = document.createElement('span');
+                toneSpan.className = `tone-indicator ${getToneColor(tone)}`;
+                toneSpan.textContent = tone;
+                contentDiv.appendChild(toneSpan);
+            }
+
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            // Animate message
+            setTimeout(() => messageDiv.classList.add('show'), 50);
+
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        user_id: userId
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, false);
+                } else {
+                    // Add AI response with emotion and tone indicators
+                    addMessage(data.response, false, data.emotion, data.tone);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Sorry, there was an error processing your message. Please try again.', false);
+                console.error('Error:', error);
+            }
+        });
+
+        // Focus input on page load
+        messageInput.focus();
+    </script>
+</body>
+</html>

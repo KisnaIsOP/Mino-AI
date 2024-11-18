@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Odyssey - Interactive Relaxation Sphere</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mindful Odyssey</h1>
+            <div id="day-night-toggle"></div>
+        </header>
+
+        <main>
+            <section id="sphere-container">
+                <div class="sphere"></div>
+            </section>
+
+            <section id="breathing-exercise">
+                <h2>Breathing Exercise</h2>
+                <div class="breathing-circle"></div>
+                <div class="breathing-text">Breathe with the circle</div>
+            </section>
+
+            <section id="sound-mixer">
+                <h2>Soundscape Mixer</h2>
+                <div class="sound-controls">
+                    <div class="sound-item">
+                        <audio id="ocean" src="assets/sounds/ocean.mp3" loop></audio>
+                        <button onclick="toggleSound('ocean')" class="sound-btn">Ocean Waves</button>
+                    </div>
+                    <div class="sound-item">
+                        <audio id="birds" src="assets/sounds/birds.mp3" loop></audio>
+                        <button onclick="toggleSound('birds')" class="sound-btn">Bird Songs</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="journal">
+                <h2>Mindful Journal</h2>
+                <div class="journal-container">
+                    <textarea id="journal-text" placeholder="Write your thoughts here..."></textarea>
+                    <button onclick="saveJournal()" class="save-btn">Save Thoughts</button>
+                </div>
+            </section>
+
+            <section id="daily-quote">
+                <h2>Today's Reflection</h2>
+                <div class="quote-container"></div>
+            </section>
+        </main>
+    </div>
+    <script src="scripts/script.js"></script>
+</body>
+</html>
